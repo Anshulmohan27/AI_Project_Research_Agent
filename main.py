@@ -24,15 +24,18 @@ def research_company(company_name: str) -> dict:
     return {"summary": response.text, "sources": sources}
 
 chroma_client = chromadb.Client()
-product_specifications = chroma_client.create_collection(name = "product_specifications")
-product_specifications.add(
-    documents = [
-        "ProductX is a an AI powered solution that automatically builds you RAG enabled custom workflows.",
-        "It automatically understands contexts for marketing, sales, operations, and finance functions.",
-        "Costing starts at $500/month and increases based on usage at $10 per million tokens."
-    ],
-    ids = ['doc1','doc2','doc3']
-)
+product_specifications = chroma_client.get_or_create_collection(name="product_specifications")
+
+def set_product_docs(documents: list[str]):
+    """Replace the product knowledge base with new documents."""
+    global product_specifications
+    chroma_client.delete_collection(name="product_specifications")
+    product_specifications = chroma_client.create_collection(name="product_specifications")
+    ids = [f"doc{i}" for i in range(len(documents))]
+    product_specifications.add(documents=documents, ids=ids)
+
+def chunk_text(raw_text: str) -> list[str]:
+    return [line.strip() for line in raw_text.split("\n") if line.strip()]
 
 def search_product_docs(question: str) -> str:
     """Search product knowledge base (pricing, features, policies) for relevant info."""
@@ -66,8 +69,8 @@ EMAIL: <step 2 answer>"""
 
 if __name__ == "__main__":
     try:
-        your_company = "CompanyX"
-        your_product = "ProductX"
+        your_company = ""
+        your_product = ""
         company = input("Company name: ")
         research = research_company(company)
         print("\n--- Research ---\n", research["summary"])

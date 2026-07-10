@@ -14,7 +14,10 @@
 </head>
 <body>
     <h2>Research & Outreach Agent</h2>
-    <input id="companyInput" placeholder="Company name (e.g. Samsung)" />
+    <input id="companyInput" placeholder="Company name (e.g. Samsung)" /><br><br>
+    <input id="yourCompanyInput" placeholder="Your company name" /><br><br>
+    <input id="yourProductNameInput" placeholder="Your product name" /><br><br>
+    <textarea id="yourProductInfoInput" rows="4" style="width:80%" placeholder="Describe your product — one fact per line (features, pricing, etc.)"></textarea><br><br>
     <button onclick="generate()">Generate</button>
     <p id="loading">Researching and drafting... this can take 10-20 seconds.</p>
 
@@ -36,15 +39,24 @@
             const company = document.getElementById("companyInput").value;
             if (!company) return;
 
+            const your_company_name = document.getElementById("yourCompanyInput").value;
+            const your_product_name = document.getElementById("yourProductNameInput").value;
+            const your_product_info = document.getElementById("yourProductInfoInput").value;
+
             document.getElementById("loading").style.display = "block";
             document.getElementById("researchSection").style.display = "none";
             document.getElementById("sourcesSection").style.display = "none";
             document.getElementById("emailSection").style.display = "none";
+            
 
             const response = await fetch("/generate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ company_name: company })
+                body: JSON.stringify({ company_name: company,
+                                        your_company: your_company_name,
+                                        your_product: your_product_name,
+                                        your_product_info: your_product_info
+                 })
             });
             const data = await response.json();
             document.getElementById("loading").style.display = "none";
