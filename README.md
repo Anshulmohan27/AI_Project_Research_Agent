@@ -2,7 +2,7 @@
 
 Give it a company name — it researches that company using live web search, then drafts a personalized cold outreach email grounded in real, verified facts about both the prospect and your own product.
 
-**Live demo:** _add your Render URL here once deployed_
+**Live demo:** [ai-project-research-agent.onrender.com](https://ai-project-research-agent.onrender.com) — try it with a real company name (note: free-tier hosting spins down after inactivity, so the first request may take 30-60+ seconds)
 
 ## Why I built this
 
