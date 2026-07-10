@@ -11,14 +11,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-class ProductDocsRequest(BaseModel):
-    product_info: str
-
-@app.post("/set-product-docs", summary="Provide your own product info for personalized outreach")
-def set_docs(request: ProductDocsRequest):
-    documents = chunk_text(request.product_info)
-    set_product_docs(documents)
-    return {"status": "Product knowledge base updated", "chunks_stored": len(documents)}
 
 class ResearchRequest(BaseModel):
     company_name: str
