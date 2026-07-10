@@ -11,8 +11,11 @@ My first project (a [Sales Lead AI Assistant](https://github.com/Anshulmohan27/s
 ## How it works
 
 1. **Research step** — the model is given Gemini's built-in web search tool and asked to summarize 2-3 recent, verifiable developments about the target company. The model decides its own search queries (often 2-3 different angles per company) and returns grounding metadata with real source URLs.
-2. **Angle + email step** — the model is given the research summary, plus a mandatory tool call to verify real product details (via a RAG-backed ChromaDB knowledge base — the same pattern from my first project). It must first articulate a *specific* connection between the research and the product before writing the email, rather than jumping straight to generic copy.
-3. Both the source citations and the final email are returned to the user, with sources rendered as clickable links.
+2. **Custom product knowledge base** — the user provides their own product description (any product, any company — not hardcoded). This text is chunked and stored in a ChromaDB vector collection at request time.
+3. **Angle + email step** — the model is given the research summary, plus a mandatory tool call to verify real product details against that knowledge base. It must first articulate a *specific* connection between the research and the product before writing the email, rather than jumping straight to generic copy.
+4. Both the source citations and the final email are returned to the user, with sources rendered as clickable links.
+
+*Known limitation:* the product knowledge base is a single shared collection, rebuilt on every `/generate` request. If two users hit the API at the same moment with different products, there's a race condition where one request's data could be overwritten mid-request by another. A production version would need per-request or per-session isolated collections rather than one shared global one — the same class of limitation as the shared chat session in my first project.
 
 ## A real bug I caught and fixed
 
@@ -50,7 +53,7 @@ Visit `http://127.0.0.1:8000/` for the web UI.
 
 ## What I'd build next
 
-- Let a user upload/edit their own product knowledge base instead of a hardcoded example
+- Per-request/session isolated product knowledge base instead of one shared global collection (see known limitation above)
 - Add a "regenerate with a different angle" option
 - Batch mode: research and draft for a list of companies at once
 - Verify numeric/dated claims from research against source pages before including them in the email
