@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Research & Outreach Agent</title>
+    <style>
+        body { font-family: sans-serif; max-width: 700px; margin: 40px auto; }
+        input { width: 60%; padding: 8px; }
+        button { padding: 8px 16px; }
+        .section { margin-top: 20px; padding: 12px; border: 1px solid #ddd; border-radius: 6px; white-space: pre-wrap; }
+        h3 { margin-bottom: 4px; }
+        a { font-size: 13px; }
+        #loading { display: none; color: #888; }
+    </style>
+</head>
+<body>
+    <h2>Research & Outreach Agent</h2>
+    <input id="companyInput" placeholder="Company name (e.g. Samsung)" />
+    <button onclick="generate()">Generate</button>
+    <p id="loading">Researching and drafting... this can take 10-20 seconds.</p>
+
+    <div id="researchSection" class="section" style="display:none;">
+        <h3>Research</h3>
+        <div id="researchText"></div>
+    </div>
+    <div id="sourcesSection" class="section" style="display:none;">
+        <h3>Sources</h3>
+        <div id="sourcesText"></div>
+    </div>
+    <div id="emailSection" class="section" style="display:none;">
+        <h3>Draft Email</h3>
+        <div id="emailText"></div>
+    </div>
+
+    <script>
+        async function generate() {
+            const company = document.getElementById("companyInput").value;
+            if (!company) return;
+
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("researchSection").style.display = "none";
+            document.getElementById("sourcesSection").style.display = "none";
+            document.getElementById("emailSection").style.display = "none";
+
+            const response = await fetch("/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ company_name: company })
+            });
+            const data = await response.json();
+            document.getElementById("loading").style.display = "none";
+
+            if (!response.ok) {
+                document.getElementById("researchText").innerText = data.detail || "Something went wrong.";
+                document.getElementById("researchSection").style.display = "block";
+                return;
+            }
+
+            document.getElementById("researchText").innerText = data.research_summary;
+            document.getElementById("researchSection").style.display = "block";
+
+            document.getElementById("sourcesText").innerHTML = data.sources
+                .map(s => `<a href="${s.url}" target="_blank">${s.title}</a>`)
+                .join("<br>");
+            document.getElementById("sourcesSection").style.display = "block";
+
+            document.getElementById("emailText").innerText = data.email;
+            document.getElementById("emailSection").style.display = "block";
+        }
+    </script>
+</body>
+</html>
